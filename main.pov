@@ -20,7 +20,6 @@ sky_sphere{
 }
 
 #macro BaseMaterial()
-//pigment{checker White*1.2, color rgb<0.2,1,1> scale 0.5}
   pigment {Gray60}
   finish{
     ambient 0.2
@@ -32,8 +31,7 @@ sky_sphere{
 
 #if (View)
 camera{
-  //location <-10*sin(clock*3),clock*10,-20*cos(clock*3)>
-  location <0, 15, 0>
+  location <0, 15, 10>
   look_at<0, 10, 56>
   angle 30
 }
@@ -312,31 +310,54 @@ object{
 #declare bridgeSweepOffset = 16.8;
 
 #macro BridgeBase(height)
-    prism {
-      conic_sweep
-      linear_spline
-      (1 - (1 - ratioBridgeBody) * height / bridgeHeight), 1,
-      8,
-      <6.3, (0 - bridgeSweepOffset)>,   <10.5, (6.3 - bridgeSweepOffset)>,  <10.5, (29.8 - bridgeSweepOffset)>, <6.3, (34 - bridgeSweepOffset)>,
-      <-6.3, (34 - bridgeSweepOffset)>, <-10.5, (29.8 - bridgeSweepOffset)>,<-10.5, (6.3 - bridgeSweepOffset)>, <-6.3, (0 - bridgeSweepOffset)>
-      BaseMaterial()
-      translate<0, -1, bridgeSweepOffset>
-      scale<1, -1 / (1 - ratioBridgeBody) * bridgeHeight, 1>
-    }
+  prism {
+    conic_sweep
+    linear_spline
+    (1 - (1 - ratioBridgeBody) * height / bridgeHeight), 1,
+    8,
+    <6.3, (0 - bridgeSweepOffset)>,   <10.5, (6.3 - bridgeSweepOffset)>,  <10.5, (29.8 - bridgeSweepOffset)>, <6.3, (34 - bridgeSweepOffset)>,
+    <-6.3, (34 - bridgeSweepOffset)>, <-10.5, (29.8 - bridgeSweepOffset)>,<-10.5, (6.3 - bridgeSweepOffset)>, <-6.3, (0 - bridgeSweepOffset)>
+    BaseMaterial()
+    translate<0, -1, bridgeSweepOffset>
+    scale<1, -1 / (1 - ratioBridgeBody) * bridgeHeight, 1>
+  }
+#end
+#macro BridgeBody(height, sfactor)
+  prism {
+    conic_sweep
+    linear_spline
+    ratioBridgeBody, 1,
+    8,
+    <6.3, (4.2 - bridgeSweepOffset)>,   <10.5, (9.4 - bridgeSweepOffset)>,    <10.5, (21.07 - bridgeSweepOffset)>, <6.3, (25.3 - bridgeSweepOffset)>,
+    <-6.3, (25.3 - bridgeSweepOffset)>, <-10.5, (21.07 - bridgeSweepOffset)>, <-10.5, (9.4 - bridgeSweepOffset)>,  <-6.3, (4.2 - bridgeSweepOffset)>
+    BaseMaterial()
+    translate<0, -1, 0>
+    scale sfactor
+    translate<0, 0, bridgeSweepOffset>
+    scale<1, -1 / (1 - ratioBridgeBody) * height, 1>
+  }
 #end
 
 #macro Bridge()
   union {
-    prism {
-      conic_sweep
-      linear_spline
-      ratioBridgeBody, 1,
-      8,
-      <6.3, (4.2 - bridgeSweepOffset)>,   <10.5, (9.4 - bridgeSweepOffset)>,    <10.5, (21.07 - bridgeSweepOffset)>, <6.3, (25.3 - bridgeSweepOffset)>,
-      <-6.3, (25.3 - bridgeSweepOffset)>, <-10.5, (21.07 - bridgeSweepOffset)>, <-10.5, (9.4 - bridgeSweepOffset)>,  <-6.3, (4.2 - bridgeSweepOffset)>
-      BaseMaterial()
-      translate<0, -1, bridgeSweepOffset>
-      scale<1, -1 / (1 - ratioBridgeBody) * bridgeHeight, 1>
+    BridgeBody(bridgeHeight, 1)
+    difference {
+      object {
+        BridgeBody(bridgeHeight, 0.83)
+        scale <1, -1, 1>
+        translate <0, bridgeHeight, 0>
+      }
+      #macro Window(X)
+        box {
+          <X, 14.5, 0>, <X + 0.75, 15.3, 6.5>
+          pigment {Black}
+        }
+      #end
+      #local N=0;
+      #while (N<10)
+        Window(-4.8 + N * 1)
+        #local N = N + 1;
+      #end
     }
     BridgeBase(3.2)
     intersection {
