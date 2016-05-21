@@ -5,19 +5,17 @@
 #include "stones.inc"
 #include "textures.inc"
 
-#declare View = 1; // if this is 0, an image for test would be rendered.
+#declare View = 0; // if this is 0, an image for test would be rendered.
 
-#if (View)
-camera{
-  //location <-10*sin(clock*3),clock*10,-20*cos(clock*3)>
-  location <50, 50,-60>
-  look_at<0, 0,100>
-  //location <-3,-1,-6>  
-  //look_at<1.414,3,-1.414>
-  angle 40
+object{
+  Plane_XZ
+    texture{
+      pigment{ NavyBlue }
+      finish { Metal }
+      normal { waves 0.5 frequency 20 scale 10 }
+    }
+    translate<0,-10,0>
 }
-
-light_source{<-5,20,-20> color 2*White}
 
 sky_sphere{
   pigment{
@@ -30,19 +28,6 @@ sky_sphere{
   }
 }
 
-object{ 
-  Plane_XZ
-    texture{
-      pigment{ NavyBlue }
-      finish { Metal }
-      normal { waves 0.5 frequency 20 scale 10 }
-    }
-    translate<0,-10,0>
-}
-
-#macro Illuminator()
-#end
-
 #macro BaseMaterial()
 //pigment{checker White*1.2, color rgb<0.2,1,1> scale 0.5}
   pigment {Gray60}
@@ -53,6 +38,33 @@ object{
     reflection 0.03
   }
 #end
+
+#if (View)
+camera{
+  //location <-10*sin(clock*3),clock*10,-20*cos(clock*3)>
+  location <50, 50, 60>
+  look_at<0, 0,80>
+  //location <-3,-1,-6>  
+  //look_at<1.414,3,-1.414>
+  angle 40
+}
+
+light_source{<-5,30,0> color 2*White}
+
+sky_sphere{
+  pigment{
+    wrinkles
+    color_map{
+      [ 0.3 color rgb<0.3,0.4,1.2>]
+      [ 0.9 White ]
+    }
+    scale <1, 0.2, 0.2>
+  }
+}
+
+#macro Illuminator()
+#end
+
 
 #macro SidePanel()
 union{
@@ -132,11 +144,25 @@ object{
   scale<-1,1,1>
 }
 
+#declare bridgeHeight = 15.7;
+#declare ratioBridgeBody = 0.8;
+#declare bridgeSweepOffset = 16.8;
+
+#macro BridgeBase(height)
+    prism {
+      conic_sweep
+      linear_spline
+      (1 - (1 - ratioBridgeBody) * height / bridgeHeight), 1,
+      8,
+      <6.3, (0 - bridgeSweepOffset)>,   <10.5, (6.3 - bridgeSweepOffset)>,  <10.5, (29.8 - bridgeSweepOffset)>, <6.3, (34 - bridgeSweepOffset)>,
+      <-6.3, (34 - bridgeSweepOffset)>, <-10.5, (29.8 - bridgeSweepOffset)>,<-10.5, (6.3 - bridgeSweepOffset)>, <-6.3, (0 - bridgeSweepOffset)>
+      BaseMaterial()
+      translate<0, -1, bridgeSweepOffset>
+      scale<1, -1 / (1 - ratioBridgeBody) * bridgeHeight, 1>
+    }
+#end
+
 #macro Bridge()
-  #declare bridgeHeight = 15.7;
-  #declare ratioBridgeBody = 0.8;
-  #declare bridgeSweepOffset = 16.8;
-  #declare bridgeBaseHeight = 3.2;
   union {
     prism {
       conic_sweep
@@ -149,16 +175,16 @@ object{
       translate<0, -1, bridgeSweepOffset>
       scale<1, -1 / (1 - ratioBridgeBody) * bridgeHeight, 1>
     }
-    prism {
-      conic_sweep
-      linear_spline
-      (1 - (1 - ratioBridgeBody) * bridgeBaseHeight / bridgeHeight), 1,
-      8,
-      <6.3, (0 - bridgeSweepOffset)>,   <10.5, (6.3 - bridgeSweepOffset)>,  <10.5, (29.8 - bridgeSweepOffset)>, <6.3, (34 - bridgeSweepOffset)>,
-      <-6.3, (34 - bridgeSweepOffset)>, <-10.5, (29.8 - bridgeSweepOffset)>,<-10.5, (6.3 - bridgeSweepOffset)>, <-6.3, (0 - bridgeSweepOffset)>
+    BridgeBase(3.2)
+    intersection {
+      BridgeBase(6.4)
+      box {<-6.2, 0, 0>, <6.2, 6.4 ,10>}
       BaseMaterial()
-      translate<0, -1, bridgeSweepOffset>
-      scale<1, -1 / (1 - ratioBridgeBody) * bridgeHeight, 1>
+    }
+    intersection {
+      BridgeBase(9.6)
+      box {<-3.1, 0, 0>, <3.2, 9.6 ,10>}
+      BaseMaterial()
     }
     translate<0, -4.6, 72>
   }
@@ -170,4 +196,114 @@ object{
 
 #else
 // Testing section
+camera{
+  location <4, 3, -5>
+  look_at<0, 2, 0>
+  angle 60
+}
+
+light_source{<-5,30,0> color 2*White}
+//light_source { z*5 color 1.5 parallel }
+
+cylinder {
+  0,
+  y*0.2,1.3
+  BaseMaterial()
+}
+difference {
+  prism {
+    linear_sweep
+    linear_spline
+    0, 1.9,
+    4,
+    <-0.7, 0>, <-0.5, 2.5>, <0.5, 2.5>, <0.7, 0>
+    rotate <-90, 90, 0>
+    translate <0.95, 0, 0>
+  }
+  box {<-0.6, 0.5, -2>, <0.6, 3, 2>}
+  BaseMaterial()
+}
+#macro CIWSBOX()
+  box {<-0.6, 0, -0.6>,<0.6, 0.59, 0.6>}
+#end
+#macro CIWSTRUSS()
+  prism {
+    conic_sweep
+    linear_spline
+    0.5, 1,
+    4,
+    <-0.6, -0.28>, <-0.6, 0.28>, <0.6, 0.28>, <0.6, -0.28>
+    translate <0, -1, 0>
+    scale <1, 1.2, 1>
+  }
+#end
+#macro CIWSTRUSSHOLE()
+  union {
+    prism {
+      linear_sweep linear_spline -5, 5, 3,
+      <-0.5, 0.05>,<0, 0.35>, <0.5, 0.05>
+    }
+    prism {
+      linear_sweep linear_spline -5, 5, 3,
+      <-0.2, 0.55>,<0, 0.42>, <0.2, 0.55>
+    }
+    prism {
+      linear_sweep linear_spline -5, 5, 3,
+      <-0.26, 0.51>, <-0.06, 0.38>, <-0.48, 0.11>
+    }
+    prism {
+      linear_sweep linear_spline -5, 5, 3,
+      <0.26, 0.51>, <0.06, 0.38>, <0.48, 0.11>
+    }
+    rotate <90, 0, 0>
+}
+#end
+union {
+  difference {
+    blob {
+      threshold 0.1
+      cylinder {
+        0,
+        y*2.2, 0.5,
+        10
+      }
+      translate <0, 0.5, 0>
+    }
+    CIWSBOX()
+    pigment {White}
+    translate <0, -0.3, 0>
+  }
+  difference {
+    CIWSBOX()
+    box {
+      <-0.5, 0.1, -1>,<0.5, 0.49, 1>
+    }
+    BaseMaterial()
+    translate <0, -0.3, 0>
+  }
+  difference {
+    CIWSTRUSS()
+    object {
+      CIWSTRUSS()
+      scale 0.9
+      translate <0, 0.1, 0>
+    }
+    CIWSTRUSSHOLE()
+    object {
+      CIWSTRUSSHOLE()
+      scale <0.5, 1, 1>
+      rotate <0, 90, 0>
+    }
+    BaseMaterial()
+    rotate <90, 0, 0>
+    translate <0, 0, -0.6>
+  }
+  cylinder {
+    0,
+    y*2.5, 0.1
+    pigment {Black}
+    rotate <-90, 0, 0>
+  }
+  translate <0, 2.1, 0>
+}
 #end
