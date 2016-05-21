@@ -10,11 +10,11 @@
 #if (View)
 camera{
   //location <-10*sin(clock*3),clock*10,-20*cos(clock*3)>
-  location <30, 10,-60>
-  look_at<0, -6,165>
+  location <50, 50,-60>
+  look_at<0, 0,100>
   //location <-3,-1,-6>  
   //look_at<1.414,3,-1.414>
-  angle 50
+  angle 40
 }
 
 light_source{<-5,20,-20> color 2*White}
@@ -133,10 +133,40 @@ object{
 }
 
 #macro Bridge()
+  #declare bridgeHeight = 15.7;
+  #declare ratioBridgeBody = 0.8;
+  #declare bridgeSweepOffset = 16.8;
+  #declare bridgeBaseHeight = 3.2;
   union {
-
+    prism {
+      conic_sweep
+      linear_spline
+      ratioBridgeBody, 1,
+      8,
+      <6.3, (4.2 - bridgeSweepOffset)>,   <10.5, (9.4 - bridgeSweepOffset)>,    <10.5, (21.07 - bridgeSweepOffset)>, <6.3, (25.3 - bridgeSweepOffset)>,
+      <-6.3, (25.3 - bridgeSweepOffset)>, <-10.5, (21.07 - bridgeSweepOffset)>, <-10.5, (9.4 - bridgeSweepOffset)>,  <-6.3, (4.2 - bridgeSweepOffset)>
+      BaseMaterial()
+      translate<0, -1, bridgeSweepOffset>
+      scale<1, -1 / (1 - ratioBridgeBody) * bridgeHeight, 1>
+    }
+    prism {
+      conic_sweep
+      linear_spline
+      (1 - (1 - ratioBridgeBody) * bridgeBaseHeight / bridgeHeight), 1,
+      8,
+      <6.3, (0 - bridgeSweepOffset)>,   <10.5, (6.3 - bridgeSweepOffset)>,  <10.5, (29.8 - bridgeSweepOffset)>, <6.3, (34 - bridgeSweepOffset)>,
+      <-6.3, (34 - bridgeSweepOffset)>, <-10.5, (29.8 - bridgeSweepOffset)>,<-10.5, (6.3 - bridgeSweepOffset)>, <-6.3, (0 - bridgeSweepOffset)>
+      BaseMaterial()
+      translate<0, -1, bridgeSweepOffset>
+      scale<1, -1 / (1 - ratioBridgeBody) * bridgeHeight, 1>
+    }
+    translate<0, -4.6, 72>
   }
 #end
+
+object{
+  Bridge()
+}
 
 #else
 // Testing section
