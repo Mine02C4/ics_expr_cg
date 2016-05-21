@@ -31,8 +31,8 @@ sky_sphere{
 
 #if (View)
 camera{
-  location <0, 15, 10>
-  look_at<0, 10, 56>
+  location <0, 15, -10>
+  look_at<0, 5, 56>
   angle 30
 }
 
@@ -328,8 +328,8 @@ object{
     linear_spline
     ratioBridgeBody, 1,
     8,
-    <6.3, (4.2 - bridgeSweepOffset)>,   <10.5, (9.4 - bridgeSweepOffset)>,    <10.5, (21.07 - bridgeSweepOffset)>, <6.3, (25.3 - bridgeSweepOffset)>,
-    <-6.3, (25.3 - bridgeSweepOffset)>, <-10.5, (21.07 - bridgeSweepOffset)>, <-10.5, (9.4 - bridgeSweepOffset)>,  <-6.3, (4.2 - bridgeSweepOffset)>
+    <4.3, (4.2 - bridgeSweepOffset)>,   <10.5, (9.4 - bridgeSweepOffset)>,    <10.5, (21.07 - bridgeSweepOffset)>, <6.3, (25.3 - bridgeSweepOffset)>,
+    <-6.3, (25.3 - bridgeSweepOffset)>, <-10.5, (21.07 - bridgeSweepOffset)>, <-10.5, (9.4 - bridgeSweepOffset)>,  <-4.3, (4.2 - bridgeSweepOffset)>
     BaseMaterial()
     translate<0, -1, 0>
     scale sfactor
@@ -349,20 +349,20 @@ object{
       }
       #macro Window(X)
         box {
-          <X, 14.5, 0>, <X + 0.75, 15.3, 6.5>
+          <X, 14.5, 0>, <X + 1, 15.3, 6.5>
           pigment {Black}
         }
       #end
       #local N=0;
-      #while (N<10)
-        Window(-4.8 + N * 1)
+      #while (N<5)
+        Window(-3 + N * 1.3)
         #local N = N + 1;
       #end
     }
     BridgeBase(3.2)
     intersection {
       BridgeBase(5.7)
-      box {<-6.2, 0, 0>, <6.2, 5.7 ,10>}
+      box {<-5.2, 0, 0>, <5.2, 5.7 ,10>}
       BaseMaterial()
     }
     difference {
