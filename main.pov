@@ -33,8 +33,8 @@ sky_sphere{
 #if (View)
 camera{
   //location <-10*sin(clock*3),clock*10,-20*cos(clock*3)>
-  location <20, 20, 40>
-  look_at<0, 8, 56>
+  location <0, 15, 0>
+  look_at<0, 10, 56>
   angle 30
 }
 
@@ -278,6 +278,35 @@ object{
   }
 #end
 
+#macro RADAR2()
+  union {
+    difference {
+      union {
+        blob {
+          threshold 0.1
+          cylinder {
+            0,
+            y*1.5, 0.5,
+            10
+          }
+          translate <0, 0.5, 0>
+        }
+        torus {
+          0.46, 0.05
+          translate <0, 1.5, 0>
+        }
+      }
+      box {<-1, 0, -1>, <1, 1.3, 1>}
+      pigment {White}
+    }
+    cone {
+      0, 0.5,
+      y*1.5, 0.1
+      BaseMaterial()
+    }
+  }
+#end
+
 #declare bridgeHeight = 15.7;
 #declare ratioBridgeBody = 0.8;
 #declare bridgeSweepOffset = 16.8;
@@ -335,6 +364,10 @@ object{
       RADAR1()
       translate <-0.5, 11.368, 4.7>
     }
+    object {
+      RADAR2()
+      translate <0.5, 11.368, 5.4>
+    }
     translate<0, -4.6, 47.3>
   }
 #end
@@ -363,5 +396,8 @@ object{
     }
     translate<0,0,0>
 }
+
+
+object {RADAR2()}
 
 #end
