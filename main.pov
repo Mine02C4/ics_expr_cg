@@ -31,8 +31,8 @@ sky_sphere{
 
 #if (View)
 camera{
-  location <0, 15, -10>
-  look_at<0, 5, 56>
+  location <30, 50, 30>
+  look_at<0, 20, 70>
   angle 30
 }
 
@@ -305,6 +305,29 @@ object{
   }
 #end
 
+#macro SPY1()
+  union {
+    prism {
+      linear_sweep
+      linear_spline
+      0, 0.2, 8,
+      <2.12,  1.4>,  <0.88, 2.12>, <-0.88, 2.12>, <-2.12, 1.4>,
+      <-2.12, -1.4>, <-0.88, -2.12>, <0.88, -2.12>, <2.12, -1.4>
+      pigment {Wheat}
+    }
+    #macro SPY1BOLT()
+      cylinder {
+        0, y*0.3, 0.04
+        BaseMaterial()
+      }
+    #end
+    object { SPY1BOLT() translate <1, 0, 1.8> }
+    object { SPY1BOLT() translate <-1, 0, 1.8> }
+    object { SPY1BOLT() translate <1, 0, -1.8> }
+    object { SPY1BOLT() translate <-1, 0, -1.8> }
+  }
+#end
+
 #declare bridgeHeight = 15.7;
 #declare ratioBridgeBody = 0.8;
 #declare bridgeSweepOffset = 16.8;
@@ -335,6 +358,27 @@ object{
     scale sfactor
     translate<0, 0, bridgeSweepOffset>
     scale<1, -1 / (1 - ratioBridgeBody) * height, 1>
+  }
+#end
+
+#macro MastBaseSpace()
+  intersection {
+    prism {
+      linear_sweep
+      linear_spline
+      0, -30,
+      3,
+      <-2.9, 15>, <0, 28.8>, <2.9, 15>
+      rotate <-90, 0, 0>
+    }
+    prism {
+      linear_sweep
+      linear_spline
+      10, -10,
+      3,
+      <9.46, 0>, <19, 49>, <29.8, 0>
+      rotate <-90, -90, 0>
+    }
   }
 #end
 
@@ -389,6 +433,49 @@ object{
       RADAR2()
       translate <0.5, 11.368, 5.4>
     }
+    #macro LSPY1()
+      object {
+        SPY1()
+        rotate <-81, -40, 0>
+        translate <6.5, 10, 8>
+      }
+    #end
+    object {
+      LSPY1()
+    }
+    object {
+      LSPY1()
+      scale <-1, 1, 1>
+    }
+    intersection {
+      MastBaseSpace()
+      box {<-5, 0, 0>, <5, 18.8, 30>}
+      BaseMaterial()
+    }
+    intersection {
+      MastBaseSpace()
+      prism {
+        linear_sweep
+        linear_spline
+        10, -10,
+        3,
+        <17, 0>, <22.6, 28.8>, <29.8, 0>
+        rotate <-90, -90, 0>
+      }
+      BaseMaterial()
+    }
+    intersection {
+      prism {
+        linear_sweep
+        linear_spline
+        10, -10,
+        4,
+        <17.1, 0>, <23.4, 33.2>, <24.7, 33.2>, <19.1, 0>
+        rotate <-90, -90, 0>
+      }
+      box {<-1.17, 15, 0>, <1.17, 33.4, 30>}
+      BaseMaterial()
+    }
     translate<0, -4.6, 47.3>
   }
 #end
@@ -397,13 +484,12 @@ object{
   Bridge()
 }
 
-
 #else
 // Testing section
 camera{
-  location <0, 3, -5>
-  look_at<0, 2, 0>
-  angle 60
+  location <0, 10, -1>
+  look_at<0, 0, 0>
+  angle 30
 }
 
 light_source{<-5,30,0> color 2*White}
@@ -418,7 +504,6 @@ object{
     translate<0,0,0>
 }
 
-
-object {RADAR2()}
+object {SPY1()}
 
 #end
