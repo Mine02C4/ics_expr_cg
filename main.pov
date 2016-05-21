@@ -7,15 +7,6 @@
 
 #declare View = 1; // if this is 0, an image for test would be rendered.
 
-object{
-  Plane_XZ
-    texture{
-      pigment{ NavyBlue }
-      finish { Metal }
-      normal { waves 0.5 frequency 20 scale 10 }
-    }
-    translate<0,-10,0>
-}
 
 sky_sphere{
   pigment{
@@ -42,12 +33,22 @@ sky_sphere{
 #if (View)
 camera{
   //location <-10*sin(clock*3),clock*10,-20*cos(clock*3)>
-  location <30, 30, -40>
-  look_at<0, 8,76>
-  angle 60
+  location <20, 20, 40>
+  look_at<0, 8, 56>
+  angle 30
 }
 
 light_source{<-5,30,0> color 2*White}
+
+object{
+  Plane_XZ
+    texture{
+      pigment{ NavyBlue }
+      finish { Metal }
+      normal { waves 0.5 frequency 20 scale 10 }
+    }
+    translate<0,-10,0>
+}
 
 sky_sphere{
   pigment{
@@ -255,6 +256,28 @@ object{
   }
 #end
 
+#macro RADAR1()
+  union {
+    union {
+      sphere {
+        <0, 1.6, 0>, 0.8
+      }
+      torus {
+        0.78, 0.05
+        translate <0, 1.6, 0>
+      }
+      cylinder {
+        y*0.7, y * 1.6, 0.4
+      }
+      pigment {Wheat}
+    }
+    cylinder {
+      0, y * 1.6, 0.3
+      BaseMaterial()
+    }
+  }
+#end
+
 #declare bridgeHeight = 15.7;
 #declare ratioBridgeBody = 0.8;
 #declare bridgeSweepOffset = 16.8;
@@ -308,6 +331,10 @@ object{
       <-1.75, 11.25, 4.2>, <1.75, 11.368, 8>
       BaseMaterial()
     }
+    object {
+      RADAR1()
+      translate <-0.5, 11.368, 4.7>
+    }
     translate<0, -4.6, 47.3>
   }
 #end
@@ -326,5 +353,15 @@ camera{
 }
 
 light_source{<-5,30,0> color 2*White}
+
+object{
+  Plane_XZ
+    texture{
+      pigment{ NavyBlue }
+      finish { Metal }
+      normal { waves 0.5 frequency 20 scale 10 }
+    }
+    translate<0,0,0>
+}
 
 #end
