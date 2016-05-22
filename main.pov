@@ -31,9 +31,9 @@ sky_sphere{
 
 #if (View)
 camera{
-  location <0, 30, 30>
+  location <10, 30, -60>
   look_at<0, 20, 70>
-  angle 30
+  angle 60
 }
 
 light_source{<-5,30,0> color 2*White}
@@ -59,8 +59,6 @@ sky_sphere{
   }
 }
 
-#macro Illuminator()
-#end
 
 
 #macro SidePanel()
@@ -305,6 +303,79 @@ object{
   }
 #end
 
+#macro RADAR3()
+  difference {
+    blob {
+      threshold 0.1
+      cylinder {
+        0,
+        y*1.7, 0.9,
+        10
+      }
+    }
+    box {<-1, -10, -1>, <1, 0, 1>}
+    pigment {White}
+  }
+#end
+
+#macro RADAR4()
+  union {
+    union {
+      sphere {
+        <0, 2.1, 0>, 1
+      }
+      cone {
+        <0, 1, 0>, 0.8,
+        <0, 2.05, 0>, 0.999
+      }
+      pigment {White}
+    }
+    union {
+      cone {
+        <0, 1, 0>, 0.8
+        <0, 0.8, 0>, 0.3
+      }
+      cone {
+        <0, 0.8, 0>, 0.3,
+        <0, 0, 0>, 0.5
+      }
+      BaseMaterial()
+    }
+  }
+#end
+
+#macro Illuminator()
+  union {
+    union {
+      difference {
+        intersection {
+          sphere {
+            <0, 2, 0>, 2
+          }
+          cylinder {
+            0, y * 2, 1
+          }
+        }
+        quadric{
+          <0.31,0,0.31>, <0,0,0>, <0,-1,0>, 0
+          translate y*0.1
+        }
+        translate <0, 0.3, 0>
+        BaseMaterial()
+      }
+      cylinder {
+        y * -0.2, y * 0.3, 0.3
+      }
+      rotate <-70, 0, 0>
+      translate <0, 1.5, 0>
+    }
+    cylinder {
+      0, y * 1.5, 0.4
+    }
+    BaseMaterial()
+  }
+#end
+
 #macro SPY1()
   union {
     prism {
@@ -452,6 +523,28 @@ object{
       box {<-5, 0, 0>, <5, 18.8, 30>}
       BaseMaterial()
     }
+    object {
+      Illuminator()
+      translate <0, 18.8, 17>
+    }
+    cylinder {
+      0, y*0.3, 2
+      translate <3, 18.5, 19>
+      BaseMaterial()
+    }
+    object {
+      RADAR4()
+      translate <3.5, 18.8, 19>
+    }
+    cylinder {
+      0, y*0.3, 2
+      translate <-3, 18.5, 19>
+      BaseMaterial()
+    }
+    object {
+      RADAR4()
+      translate <-3.5, 18.8, 19>
+    }
     intersection {
       MastBaseSpace()
       prism {
@@ -474,6 +567,11 @@ object{
         rotate <-90, -90, 0>
       }
       box {<-1.17, 15, 0>, <1.17, 33.4, 30>}
+      BaseMaterial()
+    }
+    cylinder {
+      0, y*0.3, 2
+      translate <0, 23.4, 23>
       BaseMaterial()
     }
     cylinder {
@@ -507,6 +605,10 @@ object{
       translate <0, 28.6, 21>
       BaseMaterial()
     }
+    object {
+      RADAR3()
+      translate <0, 28.9, 21>
+    }
     cylinder {
       0, y*0.5, 2
       translate <0, 33.2, 24>
@@ -528,24 +630,26 @@ object{
 
 #else
 // Testing section
-camera{
-  location <0, 10, -1>
-  look_at<0, 0, 0>
-  angle 30
-}
-
 light_source{<-5,30,0> color 2*White}
 
 object{
   Plane_XZ
-    texture{
-      pigment{ NavyBlue }
-      finish { Metal }
-      normal { waves 0.5 frequency 20 scale 10 }
-    }
-    translate<0,0,0>
+  texture{
+    pigment{ NavyBlue }
+    finish { Metal }
+    normal { waves 0.5 frequency 20 scale 10 }
+  }
+  translate<0,0,0>
 }
 
-object {RADAR3()}
+camera{
+  location <10, 5, -10>
+  look_at<0, 2, 0>
+  angle 30
+}
+
+object {
+  Illuminator()
+}
 
 #end
