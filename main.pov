@@ -1,4 +1,4 @@
-#include "colors.inc" 
+#include "colors.inc"
 #include "shapes.inc"
 #include "woods.inc"
 #include "metals.inc"
@@ -6,7 +6,6 @@
 #include "textures.inc"
 
 #declare View = 1; // if this is 0, an image for test would be rendered.
-
 
 sky_sphere{
   pigment{
@@ -31,9 +30,9 @@ sky_sphere{
 
 #if (View)
 camera{
-  location <10, 30, -60>
-  look_at<0, 20, 70>
-  angle 60
+  location <10, 10, 10>
+  look_at <0, 0, 30>
+  angle 30
 }
 
 light_source{<-5,30,0> color 2*White}
@@ -628,6 +627,144 @@ object{
   Bridge()
 }
 
+#macro MainGun()
+  union {
+    union {
+      difference {
+        intersection {
+          prism {
+            linear_sweep
+            linear_spline
+            -2, 12,
+            4,
+            <-2, 0>, <-1.3, 3.1>, <1.3, 3.1>, <2, 0>
+            rotate <-90, -90, 0>
+          }
+          prism {
+            linear_sweep
+            linear_spline
+            -3, 3,
+            4,
+            <-1.5, 0>, <-1, 3>, <1, 3>, <1.5, 0>
+            rotate <-90, 0, 0>
+          }
+          prism {
+            conic_sweep
+            linear_spline
+            0.3, 1,
+            4,
+            <2.5, 0>, <0, 2.7>, <-2.7, 0>, <0, -2.5>
+            translate <0, -1, 0>
+            scale <1, -22, 1>
+          }
+        }
+        box {<-0.38, 1, -5>, <0.38, 4, 0.2>}
+      }
+      union {
+        cylinder {
+          y*0.2, y*0.38, 1
+        }
+        cylinder {
+          y*-0.2, y*-0.38, 1
+        }
+        rotate <0, 0, 90>
+        translate <0, 1.9, -0.5>
+      }
+      difference {
+        cylinder {
+          0, y*8, 0.17
+        }
+        cylinder {
+          -0.1, y*8.1, 0.1
+        }
+        rotate <-80, 0, 0>
+        translate <0, 1.9, 0>
+      }
+      translate <0, 0.2, 0>
+    }
+    cylinder {
+      0, y*0.2, 1.3
+    }
+    box {<-1.4, -3, -1.4>, <1.4, 0, 1.4>}
+    translate <0, -3 , 28>
+    BaseMaterial()
+  }
+#end
+
+object {
+  MainGun()
+}
+
+#macro VLS()
+  #macro VLSCell()
+    union {
+      superellipsoid {
+        <0.2,0.2>
+        scale <0.4, 0.025, 0.4>
+        translate <0, 0.025, 0>
+      }
+      cylinder {
+        <-0.3, 0.025, -0.45>, <0.3, 0.025, -0.45>, 0.025
+      }
+      cylinder {
+        <0.23, 0, -0.42>, <0.29, 0, -0.42>, 0.07
+      }
+      cylinder {
+        <-0.23, 0, -0.42>, <-0.29, 0, -0.42>, 0.07
+      }
+    }
+  #end
+
+  #macro VLSModule()
+    union {
+      #local N = 0;
+      #while (N < 4)
+        object {
+          VLSCell()
+          translate <-1.35 + 0.9 * N, 0, -0.5>
+        }
+        object {
+          VLSCell()
+          translate <-1.35 + 0.9 * N, 0, -0.5>
+          scale <1, 1, -1>
+        }
+        #local N = N + 1;
+      #end
+    }
+  #end
+  union {
+    box {<-4.1, -3,-4.1>, <4.1, -0.7, 4.1>}
+    superellipsoid {
+      <0.05,0.05>
+      scale <4.1, 0.25, 4.1>
+      translate <0, -0.25, 0>
+    }
+    superellipsoid {
+      <0.05,0.05>
+      scale <4.1, 0.25, 4.1>
+      translate <0, -0.4, 0>
+    }
+    #local M = 0;
+    #while (M < 4)
+      object {
+        VLSModule()
+        translate <-2.05, 0, -3.075 + 2.05 * M>
+      }
+      object {
+        VLSModule()
+        translate <2.05, 0, -3.075 + 2.05 * M>
+      }
+      #local M = M + 1;
+    #end
+    translate <0, -3.9, 40>
+    pigment {Gray60}
+  }
+#end
+
+object {
+  VLS()
+}
+
 #else
 // Testing section
 light_source{<-5,30,0> color 2*White}
@@ -643,13 +780,14 @@ object{
 }
 
 camera{
-  location <10, 5, -10>
-  look_at<0, 2, 0>
+  location <0, 15, -20>
+  look_at<0, 0, 0>
   angle 30
 }
 
+
 object {
-  Illuminator()
+  VLS()
 }
 
 #end
