@@ -4,61 +4,170 @@
 #include "metals.inc"
 #include "stones.inc"
 #include "textures.inc"
+#include "skies.inc"
 
 #declare View = 1; // if this is 0, an image for test would be rendered.
+#declare HD = 1; // if this is 1, an high quality image would be rendered.
+#declare Camera = 1; // if this is 0, the camera position would be set test position.
 
-sky_sphere{
-  pigment{
-    wrinkles
-    color_map{
-      [ 0.3 color rgb<0.3,0.4,1.2>]
-      [ 0.9 White ]
-    }
-    scale <1, 0.2, 0.2>
-  }
+global_settings {
+  number_of_waves 20
 }
 
+
 #macro BaseMaterial()
-  pigment {Gray60}
+//  pigment {Gray60}
+  pigment {
+    color rgb<0.61, 0.6, 0.65>
+  }
   finish{
     ambient 0.2
-    diffuse 0.2
+    diffuse 0.5
     phong 0.3
-    reflection 0.03
+    reflection 0.01
   }
 #end
 
 #if (View)
-camera{
-  location <15, 30, -60>
-  look_at <5, -1, 30>
-  angle 30
+  #if (Camera)
+    camera {
+      location <10, 10, -60>
+      look_at <-10, 0, 60>
+      angle 60
+    }
+  #else
+    camera {
+      location <10, 10, -80>
+      look_at <-10, 0, 60>
+      angle 60
+    }
+  #end
+
+sky_sphere {
+  S_Cloud1
 }
 
-light_source{<-5,30,0> color 2*White}
-
-object{
-  Plane_XZ
-    texture{
-      pigment{ NavyBlue }
-      finish { Metal }
-      normal { waves 0.5 frequency 20 scale 10 }
-    }
-    translate<0,-10,0>
+light_source {
+  <10, 60,-10> color White
+  shadowless
+}
+light_source {
+  <-10, 10, -10> color Copper*2
+  parallel
+  point_at 0
 }
 
-sky_sphere{
-  pigment{
-    wrinkles
-    color_map{
-      [ 0.3 color rgb<0.3,0.4,1.2>]
-      [ 0.9 White ]
+union {
+  #declare fn_A=function{sqrt(pow(x,2)+pow(y,2)+pow(z,2))-1.5}
+  #declare fn_C=function{y}
+  #declare Blob_threshold = 0.01;
+  isosurface {
+    function {
+      1 + Blob_threshold
+      - pow( Blob_threshold, fn_A(x,y,z) )
+      - pow( Blob_threshold, fn_C(x,y,z) )
     }
-    scale <1, 0.2, 0.2>
+    contained_by { box { -3, 3 } }
+    max_gradient 6
+    scale 1.4
   }
+  Plane_XZ
+  texture {
+    pigment { NavyBlue * 0.05 }
+    finish { Metal }
+    normal { waves 0.7 frequency 20 scale 5 }
+  }
+  translate <0, -10, 12.5>
 }
 
+/*
+superellipsoid {
+  <0.2,0.2>
+  pigment {
+    bozo color_map{[0.0 color NavyBlue][0.7 White transmit 0.7]}
+    scale 0.03
+  }
+  translate <1, 0, 1>
+  scale <50, 2, 50>
+  //rotate <1, 0, 0>
+  rotate <0, -45, 0>
+  rotate <2.9, 0, 0>
+  translate <0, -10, 9.5>
+}*/
 
+#macro Bobble(S)
+  sphere {
+    0, 1
+    translate <0, 0, 1>
+    scale <0.2, 0.2, 0.5>
+    scale S
+    rotate <0, 45, 0>
+  }
+#end
+
+#macro HeadWaveR(TurnFactor)
+  union {
+    #local Far = 80;
+    #local R = seed(100);
+    #local X = 0;
+    #while (X < Far)
+      #local S = (Far - X) * 0.05;
+      object {
+        Bobble(S)
+        translate <X, rand(R) * 0.3, X>
+        rotate y*X*TurnFactor
+      }
+      #local I = 0;
+      #local Mz = exp(-0.05*X) * 40;
+      #while (I < Mz)
+        object {
+          Bobble(S * 0.5 * (Mz - I) / Mz)
+          translate <X, rand(R) * 0.2, X + I>
+          rotate y*X*TurnFactor
+        }
+      #local I = I + 0.3 * exp(0.1*I);
+      #end
+      #local X = X + 0.1;
+    #end
+    #if (HD)
+      pigment { Gray70 filter 0.2 transmit 0.6}
+    #else
+      pigment { Gray70 transmit 0}
+    #end
+    finish { Dull }
+  }
+#end
+
+#macro HeadWave()
+  #local TurnFactor = 0.1;
+  union {
+    union {
+      object {
+        HeadWaveR(-1*TurnFactor)
+      }
+      object {
+        HeadWaveR(TurnFactor)
+        scale <-1, 1, 1>
+      }
+      translate <0, 0, 11>
+    }
+    union {
+      object {
+        HeadWaveR(-1*TurnFactor)
+      }
+      object {
+        HeadWaveR(TurnFactor)
+        scale <-1, 1, 1>
+      }
+      scale 0.8
+      translate <0, 0, 150>
+    }
+    translate <0, -10, 0>
+  }
+#end
+object {
+  HeadWave()
+}
 
 #macro SidePanel()
 union{
@@ -90,13 +199,6 @@ union{
   }
 }
 #end
-object{
-  SidePanel()
-}
-object{
-  SidePanel()
-  scale<-1,1,1>
-}
 
 #macro Deck()
   union {
@@ -130,13 +232,6 @@ object{
   }
 #end
 
-object{
-  Deck()
-}
-object{
-  Deck()
-  scale<-1,1,1>
-}
 
 #macro CIWS()
   union {
@@ -507,7 +602,7 @@ object{
       object {
         SPY1()
         rotate <-81, -40, 0>
-        translate <6.5, 10, 8>
+        translate <6.5, 10, 8.1>
       }
     #end
     object {
@@ -623,10 +718,6 @@ object{
   }
 #end
 
-object{
-  Bridge()
-}
-
 #macro MainGun()
   union {
     union {
@@ -690,10 +781,6 @@ object{
     BaseMaterial()
   }
 #end
-
-object {
-  MainGun()
-}
 
 #macro VLS()
   #macro VLSCell()
@@ -761,12 +848,54 @@ object {
   }
 #end
 
+#macro Atago()
+  union {
+    object{
+      SidePanel()
+    }
+    object{
+      SidePanel()
+      scale<-1,1,1>
+    }
+    object{
+      Deck()
+    }
+    object{
+      Deck()
+      scale<-1,1,1>
+    }
+    object {
+      MainGun()
+    }
+    object{
+      Bridge()
+    }
+    object {
+      VLS()
+    }
+    translate y*10
+    rotate <0, 0, -3>
+    translate y*-10
+  }
+#end
+
 object {
-  VLS()
+  Atago()
 }
 
 #else
 // Testing section
+sky_sphere{
+  pigment{
+    wrinkles
+    color_map{
+      [ 0.3 color rgb<0.3,0.4,1.2>]
+      [ 0.9 White ]
+    }
+    scale <1, 0.2, 0.2>
+  }
+}
+
 light_source{<-5,30,0> color 2*White}
 
 object{
@@ -783,11 +912,6 @@ camera{
   location <0, 15, -20>
   look_at<0, 0, 0>
   angle 30
-}
-
-
-object {
-  VLS()
 }
 
 #end
