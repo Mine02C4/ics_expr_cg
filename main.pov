@@ -7,7 +7,7 @@
 #include "skies.inc"
 
 #declare View = 1; // if this is 0, an image for test would be rendered.
-#declare HD = 0; // if this is 1, an high quality image would be rendered.
+#declare HD = 1; // if this is 1, an high quality image would be rendered.
 #declare Camera = 1; // if this is 0, the camera position would be set test position.
 
 global_settings {
@@ -244,12 +244,14 @@ union{
     FenceWire(1.2, 0.03)
     difference {
       FenceWire(0, 1.3)
-      #local Z = 0;
-      #local PaulInterval = 1;
-      #while (Z < 52)
-        box {<0, -10, Z>, <10, 2, Z + PaulInterval - 0.05>}
-        #local Z = Z + PaulInterval;
-      #end
+      union {
+        #local Z = 0;
+        #local PaulInterval = 1.5;
+        #while (Z < 100)
+          box {<0, -10, Z>, <10, 2, Z + PaulInterval - 0.05>}
+          #local Z = Z + PaulInterval;
+        #end
+      }
       BaseMaterial()
     }
     translate<0,-0.01,0>
