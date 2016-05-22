@@ -31,7 +31,7 @@ sky_sphere{
 
 #if (View)
 camera{
-  location <30, 50, 30>
+  location <0, 30, 30>
   look_at<0, 20, 70>
   angle 30
 }
@@ -476,6 +476,48 @@ object{
       box {<-1.17, 15, 0>, <1.17, 33.4, 30>}
       BaseMaterial()
     }
+    cylinder {
+      0, y*0.3, 2
+      translate <0, 26.6, 23>
+      BaseMaterial()
+    }
+    #macro RBAR()
+      union {
+        box {
+          <0, 26.6, 23.2> , <6.5, 26.9, 23.5>
+          BaseMaterial()
+        }
+        box {
+          <0, 0, 0> , <5.5, 0.2, 0.2>
+          rotate <0, 0, 15>
+          translate <0, 25.15, 23.4>
+          BaseMaterial()
+        }
+      }
+    #end
+    object {
+      RBAR()
+    }
+    object {
+      RBAR()
+      scale x*-1
+    }
+    cylinder {
+      0, y*0.3, 2
+      translate <0, 28.6, 21>
+      BaseMaterial()
+    }
+    cylinder {
+      0, y*0.5, 2
+      translate <0, 33.2, 24>
+      BaseMaterial()
+    }
+    cylinder {
+      0, y*8.5, 0.3
+      rotate <10, 0, 0>
+      translate <0, 33.2, 25>
+      BaseMaterial()
+    }
     translate<0, -4.6, 47.3>
   }
 #end
@@ -504,6 +546,6 @@ object{
     translate<0,0,0>
 }
 
-object {SPY1()}
+object {RADAR3()}
 
 #end
