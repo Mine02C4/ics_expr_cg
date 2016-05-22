@@ -7,7 +7,7 @@
 #include "skies.inc"
 
 #declare View = 1; // if this is 0, an image for test would be rendered.
-#declare HD = 1; // if this is 1, an high quality image would be rendered.
+#declare HD = 0; // if this is 1, an high quality image would be rendered.
 #declare Camera = 1; // if this is 0, the camera position would be set test position.
 
 global_settings {
@@ -16,7 +16,6 @@ global_settings {
 
 
 #macro BaseMaterial()
-//  pigment {Gray60}
   pigment {
     color rgb<0.61, 0.6, 0.65>
   }
@@ -37,8 +36,8 @@ global_settings {
     }
   #else
     camera {
-      location <10, 10, -80>
-      look_at <-10, 0, 60>
+      location <10, 1, 0>
+      look_at <0, 0, 30>
       angle 60
     }
   #end
@@ -202,31 +201,56 @@ union{
 
 #macro Deck()
   union {
-    object {
+    bicubic_patch{
+      type 1
+      flatness 0
+      u_steps 4
+      v_steps 4
+      <0,0,0>, <5.0,-1,10>, <10.5, -4.6, 30>,  <10.5, -4.6, 51.5>,
+      <0,0,0>, <4,-1,10>,   <9,  -4.6, 30>,  <9,    -4.6, 51.5>,
+      <0,0,0>, <1,-1,10>,   <1,  -4.6, 30>,  <1,    -4.6, 51.5>,
+      <0,0,0>, <0,-1,10>,   <0,  -4.6, 30>,  <0,    -4.6, 51.5>
+      BaseMaterial()
+    }
+    bicubic_patch {
+      type 1
+      flatness 0
+      u_steps 4
+      v_steps 4
+      <10.5, -4.6, 51.5>, <10.5, -4.6,   100>, <10,-4.6, 130>, <7.8, -4.6,165>,
+      <9,    -4.6, 51.5>, <9,    -4.6,   100>, <9, -4.6, 130>, <6,   -4.6,165>,
+      <1,    -4.6, 51.5>, <1,    -4.6,   100>, <1, -4.6, 130>, <1,   -4.6,165>,
+      <0,    -4.6, 51.5>, <0,    -4.6,   100>, <0, -4.6, 130>, <0,   -4.6,165>
+      BaseMaterial()
+    }
+    #macro FenceWire(H, R)
+      #local O = H + R * 0.5;
+      #local P = H + R;
       bicubic_patch{
         type 1
         flatness 0
         u_steps 4
         v_steps 4
-        <0,0,0>, <5.0,-1,10>, <10.5, -4.6, 30>,  <10.5, -4.6, 51.5>,
-        <0,0,0>, <4,-1,10>,   <9,  -4.6, 30>,  <9,    -4.6, 51.5>,
-        <0,0,0>, <1,-1,10>,   <1,  -4.6, 30>,  <1,    -4.6, 51.5>,
-        <0,0,0>, <0,-1,10>,   <0,  -4.6, 30>,  <0,    -4.6, 51.5>
+        <0,0 + H,0>, <5.0,-1 + H,10>, <10.5, -4.6 + H, 30>,  <10.5, -4.6 + H, 51.5>,
+        <0,0 + O,0>, <5.0,-1 + O,10>, <10.5, -4.6 + O, 30>,  <10.5, -4.6 + O, 51.5>,
+        <0,0 + O,0>, <5.0,-1 + O,10>, <10.5, -4.6 + O, 30>,  <10.5, -4.6 + O, 51.5>,
+        <0,0 + P,0>, <5.0,-1 + P,10>, <10.5, -4.6 + P, 30>,  <10.5, -4.6 + P, 51.5>
         BaseMaterial()
       }
-    }
-    object {
-      bicubic_patch {
-         type 1
-         flatness 0
-         u_steps 4
-         v_steps 4
-         <10.5, -4.6, 51.5>, <10.5, -4.6,   100>, <10,-4.6, 130>, <7.8, -4.6,165>,
-         <9,    -4.6, 51.5>, <9,    -4.6,   100>, <9, -4.6, 130>, <6,   -4.6,165>,
-         <1,    -4.6, 51.5>, <1,    -4.6,   100>, <1, -4.6, 130>, <1,   -4.6,165>,
-         <0,    -4.6, 51.5>, <0,    -4.6,   100>, <0, -4.6, 130>, <0,   -4.6,165>
-         BaseMaterial()
-       }
+    #end
+    FenceWire(0.3, 0.03)
+    FenceWire(0.6, 0.03)
+    FenceWire(0.9, 0.03)
+    FenceWire(1.2, 0.03)
+    difference {
+      FenceWire(0, 1.3)
+      #local Z = 0;
+      #local PaulInterval = 1;
+      #while (Z < 52)
+        box {<0, -10, Z>, <10, 2, Z + PaulInterval - 0.05>}
+        #local Z = Z + PaulInterval;
+      #end
+      BaseMaterial()
     }
     translate<0,-0.01,0>
   }
