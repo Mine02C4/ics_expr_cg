@@ -79,21 +79,6 @@ union {
   translate <0, -10, 12.5>
 }
 
-/*
-superellipsoid {
-  <0.2,0.2>
-  pigment {
-    bozo color_map{[0.0 color NavyBlue][0.7 White transmit 0.7]}
-    scale 0.03
-  }
-  translate <1, 0, 1>
-  scale <50, 2, 50>
-  //rotate <1, 0, 0>
-  rotate <0, -45, 0>
-  rotate <2.9, 0, 0>
-  translate <0, -10, 9.5>
-}*/
-
 #macro Bobble(S)
   sphere {
     0, 1
